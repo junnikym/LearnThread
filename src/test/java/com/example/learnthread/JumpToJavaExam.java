@@ -76,6 +76,7 @@ public class JumpToJavaExam {
 
 	@Test
 	void SampleThread_쓰래드_Runnable_인터페이스_사용() throws Exception {
+
 		ArrayList<Thread> threads = new ArrayList<>();
 		for(int i = 0; i < 10; i++) {
 			Thread t = new Thread( new RunnableSample(i) ); // Thread 생성자에 Runnable 객체 전달
