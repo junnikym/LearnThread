@@ -114,7 +114,7 @@ void SampleThread_쓰래드_종료_후_함수_종료() throws Exception {
 
 # Synchronized
 
-Java에서 동기/비동기를 구현하는데에는 2가지 방식이 있다.
+Java에서 동기 구현하는데에는 2가지 방식이 있다.
 
 1. Synchronized Method 사용
 2. Synchronized Block 사용
@@ -141,4 +141,81 @@ public void function() {
 
 다음 두가지 방식으로 함수에 Synchronized 키워드를 선언하면 해당 함수가 포함된 객체에 Lock을 걸게되어 
 쓰레드가 서로서로 영향을 미치는 것을 방지할 수 있다.
+
+## static 함수에서 synchronized
+
+Static Method에 Synchronized 키워드를 정의한다면 Method가 속한 Class 전체가 Lock이 걸리게 된다.
+
+예를 들어
+``` java
+public class SyncOnStatic {
+
+	private static String someStr;
+
+	public static void toSomething() {
+		someStr = "something";
+		try {
+			long sleep = (long)(Math.random() * 20);
+			Thread.sleep(sleep);
+			if( !someStr.equals("something") )
+				System.out.println("sync broken - something");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void toSomeone() {
+		someStr = "someone";
+		try {
+			long sleep = (long)(Math.random() * 10);
+			Thread.sleep(sleep);
+			if( !someStr.equals("someone") )
+				System.out.println("sync broken - someone");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}
+```
+
+라는 클래스를 생성하고 해당 클래스 내부에 두가지 함수를 각기 다른 쓰레드에서 동시에 실행시킨다면 서로 메모리에 영향을 미치게된다.
+
+``` java
+new Thread(()-> {
+    for(int i = 0; i < 10000; i++)
+        SyncOnStatic.toSomething();
+}).start();
+
+new Thread(()-> {
+    for(int i = 0; i < 10000; i++)
+        SyncOnStatic.toSomeone();
+}).start();
+
+--------------------------------------------------
+ ( 결과 )
+    sync broken - something
+    sync broken - someone
+    sync broken - something
+    sync broken - someone
+    sync broken - something
+    sync broken - someone
+    ...
+```
+
+하지만 위 클래스에 다음과 같이 Synchronized 키워드를 붙이게된다면
+
+``` java
+public static synchronized void toSomething() {
+    ...
+}
+
+public static synchronized void toSomeone() {
+    ...
+}
+```
+
+해당 Static Method가 실행되면 그 Method가 속한 Class 전체에 Lock을 걸기때문에 아무런 일이 일어나지 않는다.
+
+** ref : <https://tourspace.tistory.com/54>
 

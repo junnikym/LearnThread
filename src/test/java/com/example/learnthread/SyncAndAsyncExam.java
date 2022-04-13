@@ -147,4 +147,31 @@ public class SyncAndAsyncExam {
 		System.out.println("Test Function Out. ----");
 	}
 
+	//////////////////////////////
+	// Static 에서 Synchronized
+	//////////////////////////////
+
+	/**
+	 * {@link SyncOnStatic} 클래스 내부의 synchronized를 제거한다면
+	 * sync broken - ... 로그가 찍힘
+	 */
+	@Test
+	void SyncExam_static에_synchronize_적용() {
+		SyncBlockExam syncExam = new SyncBlockExam();
+
+		System.out.println("Test Function In. -----");
+
+		new Thread(()-> {
+			for(int i = 0; i < 10000; i++)
+				SyncOnStatic.toSomething();
+		}).start();
+
+		new Thread(()-> {
+			for(int i = 0; i < 10000; i++)
+				SyncOnStatic.toSomeone();
+		}).start();
+
+		System.out.println("Test Function Out. ----");
+	}
+
 }
